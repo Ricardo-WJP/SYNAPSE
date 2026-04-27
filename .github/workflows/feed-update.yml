@@ -1,3 +1,6 @@
+# SYNAPSE · 触点 - Daily Feed Update Workflow
+# Updates design and AI articles from RSS feeds daily at 8:00 AM UTC
+
 name: Daily Feed Update
 
 on:

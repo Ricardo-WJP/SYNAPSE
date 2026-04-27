@@ -1,0 +1,22 @@
+name: Daily Feed Update
+
+on:
+  schedule:
+    # Run at 8:00 AM UTC daily (16:00 Beijing time)
+    - cron: "0 8 * * *"
+  workflow_dispatch:
+    # Allow manual trigger for testing
+
+jobs:
+  update-feed:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Trigger Feed Update
+        uses: fjogeleit/http-request-action@v1
+        with:
+          method: 'POST'
+          url: '${{ secrets.API_BASE }}/api/feed'
+          customHeaders: '{"Authorization": "Bearer ${{ secrets.FEED_UPDATE_TOKEN }}", "Content-Type": "application/json"}'
+          timeout: 300000

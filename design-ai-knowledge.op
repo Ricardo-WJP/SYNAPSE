@@ -1,0 +1,270 @@
+{
+  "version": "1.0",
+  "name": "DesignAI Knowledge",
+  "children": [
+    {
+      "id": "homepage",
+      "type": "frame",
+      "name": "Homepage",
+      "children": [
+        {
+          "id": "hero-section",
+          "type": "frame",
+          "name": "Hero Section",
+          "width": 1440,
+          "height": 900,
+          "x": 0,
+          "y": 0,
+          "fill": [{ "type": "solid", "color": "#0a0a0a" }],
+          "children": [
+            {
+              "id": "hero-title",
+              "type": "text",
+              "name": "Hero Title",
+              "x": 720,
+              "y": 350,
+              "width": 1000,
+              "text": "设计与AI的交汇点",
+              "fontSize": 72,
+              "fontWeight": 700,
+              "fill": "#ffffff",
+              "textAlign": "center"
+            },
+            {
+              "id": "hero-subtitle",
+              "type": "text",
+              "name": "Hero Subtitle",
+              "x": 720,
+              "y": 450,
+              "width": 800,
+              "text": "探索设计趋势与人工智能的交汇点，发现创作新边界",
+              "fontSize": 18,
+              "fill": "rgba(255,255,255,0.7)",
+              "textAlign": "center"
+            },
+            {
+              "id": "hero-cta-1",
+              "type": "frame",
+              "name": "CTA Primary",
+              "x": 620,
+              "y": 550,
+              "width": 140,
+              "height": 48,
+              "fill": [{ "type": "solid", "color": "#ff6b00" }],
+              "cornerRadius": 8,
+              "children": [
+                {
+                  "id": "cta-1-text",
+                  "type": "text",
+                  "name": "CTA Text",
+                  "x": 70,
+                  "y": 14,
+                  "text": "浏览设计",
+                  "fontSize": 14,
+                  "fontWeight": 600,
+                  "fill": "#ffffff",
+                  "textAlign": "center"
+                }
+              ]
+            },
+            {
+              "id": "hero-cta-2",
+              "type": "frame",
+              "name": "CTA Secondary",
+              "x": 780,
+              "y": 550,
+              "width": 140,
+              "height": 48,
+              "fill": [{ "type": "solid", "color": "transparent" }],
+              "cornerRadius": 8,
+              "children": [
+                {
+                  "id": "cta-2-text",
+                  "type": "text",
+                  "name": "CTA Text",
+                  "x": 70,
+                  "y": 14,
+                  "text": "AI 资讯",
+                  "fontSize": 14,
+                  "fontWeight": 600,
+                  "fill": "#ffffff",
+                  "textAlign": "center"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "featured-section",
+          "type": "frame",
+          "name": "Featured Section",
+          "x": 0,
+          "y": 900,
+          "fill": [{ "type": "solid", "color": "#0a0a0a" }],
+          "children": [
+            {
+              "id": "card-1",
+              "type": "frame",
+              "name": "Article Card 1",
+              "x": 100,
+              "y": 120,
+              "width": 380,
+              "height": 420,
+              "fill": [{ "type": "solid", "color": "#141414" }],
+              "cornerRadius": 16,
+              "children": [
+                {
+                  "id": "card-1-title",
+                  "type": "text",
+                  "name": "Card Title",
+                  "x": 16,
+                  "y": 220,
+                  "text": "Claude 4 发布：AI 编程能力大幅提升",
+                  "fontSize": 18,
+                  "fontWeight": 600,
+                  "fill": "#ffffff"
+                }
+              ]
+            },
+            {
+              "id": "card-2",
+              "type": "frame",
+              "name": "Article Card 2",
+              "x": 530,
+              "y": 120,
+              "width": 380,
+              "height": 420,
+              "fill": [{ "type": "solid", "color": "#141414" }],
+              "cornerRadius": 16,
+              "children": [
+                {
+                  "id": "card-2-title",
+                  "type": "text",
+                  "name": "Card Title",
+                  "x": 16,
+                  "y": 220,
+                  "text": "Figma Variables 全面升级",
+                  "fontSize": 18,
+                  "fontWeight": 600,
+                  "fill": "#ffffff"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "design-page",
+      "type": "frame",
+      "name": "Design Page",
+      "children": [
+        {
+          "id": "design-hero",
+          "type": "frame",
+          "name": "Design Hero",
+          "width": 1440,
+          "height": 400,
+          "x": 0,
+          "y": 0,
+          "fill": [{ "type": "solid", "color": "#0a0a0a" }],
+          "children": [
+            {
+              "id": "design-badge",
+              "type": "frame",
+              "name": "Badge",
+              "x": 670,
+              "y": 100,
+              "width": 100,
+              "height": 32,
+              "fill": [{ "type": "solid", "color": "rgba(236,72,153,0.15)" }],
+              "cornerRadius": 6,
+              "children": [
+                {
+                  "id": "design-badge-text",
+                  "type": "text",
+                  "name": "Badge Text",
+                  "x": 50,
+                  "y": 8,
+                  "text": "设计",
+                  "fontSize": 12,
+                  "fontWeight": 600,
+                  "fill": "#ec4899",
+                  "textAlign": "center"
+                }
+              ]
+            },
+            {
+              "id": "design-title",
+              "type": "text",
+              "name": "Page Title",
+              "x": 720,
+              "y": 150,
+              "text": "设计资讯",
+              "fontSize": 56,
+              "fontWeight": 700,
+              "fill": "#ffffff",
+              "textAlign": "center"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ai-page",
+      "type": "frame",
+      "name": "AI Page",
+      "children": [
+        {
+          "id": "ai-hero",
+          "type": "frame",
+          "name": "AI Hero",
+          "width": 1440,
+          "height": 400,
+          "x": 0,
+          "y": 0,
+          "fill": [{ "type": "solid", "color": "#0a0a0a" }],
+          "children": [
+            {
+              "id": "ai-badge",
+              "type": "frame",
+              "name": "Badge",
+              "x": 660,
+              "y": 100,
+              "width": 120,
+              "height": 32,
+              "fill": [{ "type": "solid", "color": "rgba(66,133,244,0.15)" }],
+              "cornerRadius": 6,
+              "children": [
+                {
+                  "id": "ai-badge-text",
+                  "type": "text",
+                  "name": "Badge Text",
+                  "x": 60,
+                  "y": 8,
+                  "text": "人工智能",
+                  "fontSize": 12,
+                  "fontWeight": 600,
+                  "fill": "#4285f4",
+                  "textAlign": "center"
+                }
+              ]
+            },
+            {
+              "id": "ai-title",
+              "type": "text",
+              "name": "Page Title",
+              "x": 720,
+              "y": 150,
+              "text": "AI 资讯",
+              "fontSize": 56,
+              "fontWeight": 700,
+              "fill": "#ffffff",
+              "textAlign": "center"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

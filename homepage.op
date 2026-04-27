@@ -1,0 +1,1 @@
+{"version":"1.0","name":"Homepage","children":[{"id":"F5U2KnYNiPU14w6x862T8","type":"frame","name":"Homepage","width":1440,"height":900,"x":0,"y":0,"fill":[{"type":"solid","color":"#0a0a0a"}],"children":[{"id":"hero-title","type":"text","name":"Hero Title","content":"设计与AI的交汇点","fontSize":72,"fontWeight":700,"fill":[{"type":"solid","color":"#ffffff"}],"textAlign":"center"}]}]}

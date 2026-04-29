@@ -80,16 +80,24 @@ export async function POST(request: NextRequest) {
       slug,
     };
 
-    // Stage 3: AI processing
+    // Stage 3: AI processing with timeout
     if (!skipAi) {
       try {
-        const aiResult = await processArticle({
-          title: article.title,
-          description: article.description,
-          content: article.content,
-          category: article.category,
-          language: article.language,
-        });
+        const timeoutMs = 8000;
+        const timeoutPromise = new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error("AI processing timeout")), timeoutMs)
+        );
+
+        const aiResult = await Promise.race([
+          processArticle({
+            title: article.title,
+            description: article.description,
+            content: article.content,
+            category: article.category,
+            language: article.language,
+          }),
+          timeoutPromise,
+        ]);
 
         processedData = {
           ...processedData,

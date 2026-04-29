@@ -59,7 +59,6 @@ export function validateArticle(article: {
   const spamPatterns = [
     /\b(viagra|cialis|casino|lottery|winner|prize)\b/i,
     /\b(click here|limited time|act now)\b/i,
-    /[一-龥]{0,2}[a-zA-Z]{10,}[一-龥]{0,2}/, // 中英文混杂的乱码
   ];
   const textToCheck = `${title} ${desc}`.toLowerCase();
   for (const pattern of spamPatterns) {

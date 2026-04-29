@@ -1,6 +1,6 @@
-# DesignAI Knowledge
+# synapse·触点
 
-一个极具设计感的 AI + 设计资讯网站，参考 Google Design 风格。
+一个极具设计感的 AI + 设计资讯网站，参考 Google Design 风格。（AI初学者试手项目，还是很幼稚，打算慢慢进行完善）
 
 ## 功能特性
 

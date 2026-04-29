@@ -17,9 +17,8 @@ jobs:
 
     steps:
       - name: Trigger Feed Update
-        uses: fjogeleit/http-request-action@v1
-        with:
-          method: 'POST'
-          url: '${{ secrets.API_BASE }}/api/feed'
-          customHeaders: '{"Authorization": "Bearer ${{ secrets.FEED_UPDATE_TOKEN }}", "Content-Type": "application/json"}'
-          timeout: 300000
+        run: |
+          curl -X POST '${{ secrets.API_BASE }}/api/feed' \
+            -H 'Content-Type: application/json' \
+            -H 'Authorization: Bearer ${{ secrets.FEED_UPDATE_TOKEN }}' \
+            --max-time 300

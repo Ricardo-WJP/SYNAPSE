@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
 
   const sources = getEnabledSources(category || undefined);
 
-  const rawArticles = await fetchAllSources(sources);
+  const rawArticles = (await fetchAllSources(sources)).slice(0, 15);
 
   const processed: {
     title: string;

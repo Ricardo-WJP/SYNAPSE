@@ -631,6 +631,29 @@
   }
 }
 
+/* ===== Hero Mobile Adaptation ===== */
+@media (max-width: 768px) {
+  .hero-content {
+    padding-top: 160px !important;
+    padding-bottom: 80px !important;
+  }
+
+  .hero-vertical-text {
+    display: none;
+  }
+}
+
+/* ===== Featured Grid Mobile Optimization ===== */
+@media (max-width: 768px) {
+  .featured-grid {
+    gap: 16px;
+  }
+
+  .section-transition-to-secondary {
+    padding: 48px 0 60px;
+  }
+}
+
 /* ===== Touch-Friendly Card Interactions ===== */
 
 /* Desktop: hover effects */
@@ -660,20 +683,6 @@
   }
 }
 
-/* Touch devices: active state feedback */
-@media (hover: none) and (pointer: coarse) {
-  .card-interactive:active {
-    transform: scale(0.98);
-    opacity: 0.9;
-    transition: transform 0.1s ease, opacity 0.1s ease;
-  }
-
-  .sidecard-interactive:active {
-    transform: scale(0.98);
-    opacity: 0.9;
-    transition: transform 0.1s ease, opacity 0.1s ease;
-  }
-}
 
 /* ===== Page Transitions ===== */
 .page-transition-fade {

@@ -127,6 +127,7 @@ export default function Home() {
 
         {/* Vertical Decorative Text — Left Side */}
         <div
+          className="hero-vertical-text"
           style={{
             position: "absolute",
             left: "clamp(12px, 2vw, 24px)",
@@ -157,7 +158,7 @@ export default function Home() {
 
         {/* Main Content */}
         <div
-          className="container-wide"
+          className="container-wide hero-content"
           style={{
             position: "relative",
             zIndex: 2,

@@ -60,11 +60,11 @@ export default function Card({
   return (
     <Link href={href} style={{ textDecoration: "none", display: "block", height: "100%" }}>
       <article
+        className="card-interactive"
         style={{
           height: "100%",
           display: "flex",
           flexDirection: "column",
-          cursor: "pointer",
           background: "rgba(255,255,255,0.02)",
           backdropFilter: "blur(8px)",
           WebkitBackdropFilter: "blur(8px)",
@@ -72,16 +72,7 @@ export default function Card({
           overflow: "hidden",
           transition: "transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.35s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.35s ease",
           border: "1px solid rgba(255,255,255,0.05)",
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.transform = "translateY(-2px)";
-          e.currentTarget.style.boxShadow = "0 8px 32px rgba(201,185,154,0.06)";
-          e.currentTarget.style.borderColor = "rgba(201,185,154,0.12)";
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.transform = "translateY(0)";
-          e.currentTarget.style.boxShadow = "none";
-          e.currentTarget.style.borderColor = "rgba(255,255,255,0.05)";
+          touchAction: "manipulation",
         }}
       >
         {image && (
@@ -95,6 +86,7 @@ export default function Card({
             <img
               src={image}
               alt={title}
+              className="card-image-img"
               style={{
                 width: "100%",
                 height: "100%",
@@ -103,12 +95,6 @@ export default function Card({
                 filter: "brightness(0.9) saturate(0.9)",
               }}
               loading="eager"
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "scale(1.03)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "scale(1)";
-              }}
             />
           </div>
         )}
@@ -146,6 +132,7 @@ export default function Card({
           )}
 
           <h3
+            className="card-title"
             style={{
               fontSize: featured ? "20px" : "17px",
               fontWeight: 600,
@@ -154,12 +141,6 @@ export default function Card({
               color: "#F0EDE8",
               margin: 0,
               transition: "color 0.25s ease",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.color = "#C9B99A";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.color = "#F0EDE8";
             }}
           >
             {title}
@@ -182,6 +163,7 @@ export default function Card({
 
           <div style={{ marginTop: "auto", paddingTop: "10px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <span
+              className="card-read-more"
               style={{
                 fontSize: "13px",
                 fontWeight: 500,
@@ -191,12 +173,6 @@ export default function Card({
                 alignItems: "center",
                 gap: "6px",
                 transition: "gap 0.25s ease",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.gap = "10px";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.gap = "6px";
               }}
             >
               {language === "zh" ? "阅读更多" : "Read More"}

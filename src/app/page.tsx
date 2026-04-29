@@ -384,10 +384,11 @@ export default function Home() {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "minmax(0, 1.5fr) minmax(0, 1fr)",
+              gridTemplateColumns: "repeat(2, 1fr)",
               gap: "24px",
               alignItems: "start",
             }}
+            className="featured-grid"
           >
             <ScrollRevealCard index={0}>
               <Card
@@ -436,6 +437,7 @@ export default function Home() {
           </div>
 
           <div
+            className="latest-grid"
             style={{
               display: "grid",
               gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",

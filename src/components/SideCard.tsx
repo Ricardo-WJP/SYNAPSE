@@ -53,7 +53,7 @@ export default function SideCard({ article, delay }: SideCardProps) {
   return (
     <Link
       href={article.href}
-      className={`animate-fade-in-up delay-${delay}`}
+      className={`animate-fade-in-up delay-${delay} sidecard-interactive`}
       style={{
         textDecoration: "none",
         display: "flex",
@@ -66,16 +66,7 @@ export default function SideCard({ article, delay }: SideCardProps) {
         padding: "22px",
         transition: "transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.35s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.35s ease",
         border: "1px solid rgba(255,255,255,0.05)",
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = "translateY(-2px)";
-        e.currentTarget.style.boxShadow = "0 6px 24px rgba(201,185,154,0.06)";
-        e.currentTarget.style.borderColor = "rgba(201,185,154,0.12)";
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = "translateY(0)";
-        e.currentTarget.style.boxShadow = "none";
-        e.currentTarget.style.borderColor = "rgba(255,255,255,0.05)";
+        touchAction: "manipulation",
       }}
     >
       <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>

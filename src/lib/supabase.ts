@@ -73,7 +73,21 @@ export async function getArticles(options?: {
     query = query.range(options.offset, options.offset + (options.limit || 10) - 1);
   }
 
-  return query;
+  const { data, error } = await query;
+
+  if (!data) {
+    return { data: [], error };
+  }
+
+  // Deduplicate by source_url, keeping the first (most recent) occurrence
+  const seen = new Set<string>();
+  const deduped = data.filter((article) => {
+    if (seen.has(article.source_url)) return false;
+    seen.add(article.source_url);
+    return true;
+  });
+
+  return { data: deduped, error: null };
 }
 
 export async function getArticleBySlug(slug: string) {
@@ -107,9 +121,9 @@ export async function checkArticleExistsByUrl(sourceUrl: string): Promise<boolea
     .from("articles")
     .select("id")
     .eq("source_url", sourceUrl)
-    .single();
+    .limit(1);
 
-  return !error && data !== null;
+  return !error && data !== null && data.length > 0;
 }
 
 export async function upsertArticle(article: {

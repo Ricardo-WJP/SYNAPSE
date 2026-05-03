@@ -344,8 +344,8 @@ function createSupabaseClient() {
 
 async function checkArticleExistsByUrl(supabase, sourceUrl) {
   if (!sourceUrl) return false;
-  const { data, error } = await supabase.from("articles").select("id").eq("source_url", sourceUrl).single();
-  return !error && data !== null;
+  const { data, error } = await supabase.from("articles").select("id").eq("source_url", sourceUrl).limit(1);
+  return !error && data !== null && data.length > 0;
 }
 
 async function upsertArticle(supabase, article) {

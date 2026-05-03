@@ -48,6 +48,11 @@ const RSS_SOURCES = [
   { id: "openai-blog", name: "OpenAI Blog", url: "https://openai.com/blog/rss.xml", category: "ai", language: "en" },
   { id: "deepmind-blog", name: "Google DeepMind", url: "https://deepmind.com/blog/feed/broad/", category: "ai", language: "en" },
   { id: "anthropic-news", name: "Anthropic News", url: "https://www.anthropic.com/news/rss", category: "ai", language: "en" },
+  { id: "ai-news", name: "AI News", url: "https://www.artificialintelligence-news.com/feed/", category: "ai", language: "en" },
+  { id: "verge-ai", name: "The Verge AI", url: "https://www.theverge.com/ai-artificial-intelligence/rss/index.xml", category: "ai", language: "en" },
+  { id: "techcrunch-ai", name: "TechCrunch AI", url: "https://techcrunch.com/category/artificial-intelligence/feed/", category: "ai", language: "en" },
+  { id: "marktechpost", name: "MarkTechPost", url: "https://www.marktechpost.com/feed/", category: "ai", language: "en" },
+  { id: "analytics-india", name: "Analytics India Mag", url: "https://analyticsindiamag.com/feed/", category: "ai", language: "en" },
 ];
 
 // ============== Utilities ==============
@@ -81,6 +86,37 @@ function extractImageFromContent(content) {
   if (imgMatch) return imgMatch[1];
   const ogMatch = content.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i);
   if (ogMatch) return ogMatch[1];
+  return undefined;
+}
+
+function extractMediaThumbnail(item) {
+  const media = item["media:thumbnail"];
+  if (!media) return undefined;
+
+  if (typeof media === "string") {
+    return media;
+  }
+
+  if (Array.isArray(media) && media.length > 0) {
+    const first = media[0];
+    if (typeof first === "string") return first;
+    if (first && typeof first === "object") {
+      const url = first["$"];
+      if (url && typeof url === "object") {
+        return url["url"];
+      }
+    }
+  }
+
+  if (typeof media === "object") {
+    const url = media["$"];
+    if (url && typeof url === "object") {
+      return url["url"];
+    }
+    const directUrl = media["url"];
+    if (typeof directUrl === "string") return directUrl;
+  }
+
   return undefined;
 }
 
@@ -225,7 +261,7 @@ async function fetchRSSSource(source) {
     const feed = await parser.parseURL(source.url);
     return feed.items.slice(0, 20).map((item) => {
       const description = stripHtml(item.contentSnippet || item.content || item.summary || "").substring(0, 500);
-      const imageUrl = item.thumbnail || extractImageFromContent(item.content || item["content:encoded"]);
+      const imageUrl = item.thumbnail || extractMediaThumbnail(item) || extractImageFromContent(item.content || item["content:encoded"]);
 
       return {
         title: item.title || "Untitled",
@@ -359,8 +395,7 @@ async function processArticles(category, skipAI) {
         };
       } catch (aiError) {
         console.log(`  -> AI failed: ${aiError.message}`);
-        processed.push({ title: article.title, status: "skipped", stage: "ai-processing", error: aiError.message });
-        continue;
+        // Continue with original data if AI processing fails
       }
     }
 

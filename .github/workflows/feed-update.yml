@@ -33,4 +33,4 @@ jobs:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.API_BASE }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.FEED_UPDATE_TOKEN }}
           MINIMAX_API_KEY: ${{ secrets.MINIMAX_API_KEY }}
-        run: node scripts/content-update.mjs
+        run: node scripts/content-update.mjs --skip-ai

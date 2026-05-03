@@ -287,7 +287,7 @@ async function processArticles(category, skipAI) {
   console.log(`Category: ${category || "all"}, Skip AI: ${skipAI}`);
 
   // Validate config
-  if (!CONFIG.miniMaxApiKey) {
+  if (!skipAI && !CONFIG.miniMaxApiKey) {
     throw new Error("MINIMAX_API_KEY is not configured");
   }
   if (!CONFIG.supabaseUrl || !CONFIG.supabaseAnonKey) {

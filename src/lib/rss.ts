@@ -52,6 +52,39 @@ function extractImageFromContent(content?: string): string | undefined {
   return undefined;
 }
 
+function extractMediaThumbnail(
+  item: Parser.Item
+): string | undefined {
+  const media = (item as Record<string, unknown>)["media:thumbnail"];
+  if (!media) return undefined;
+
+  if (typeof media === "string") {
+    return media;
+  }
+
+  if (Array.isArray(media) && media.length > 0) {
+    const first = media[0];
+    if (typeof first === "string") return first;
+    if (first && typeof first === "object") {
+      const url = (first as Record<string, unknown>)["$"];
+      if (url && typeof url === "object") {
+        return (url as Record<string, string>)["url"];
+      }
+    }
+  }
+
+  if (typeof media === "object") {
+    const url = (media as Record<string, unknown>)["$"];
+    if (url && typeof url === "object") {
+      return (url as Record<string, string>)["url"];
+    }
+    const directUrl = (media as Record<string, unknown>)["url"];
+    if (typeof directUrl === "string") return directUrl;
+  }
+
+  return undefined;
+}
+
 function stripHtml(html?: string): string {
   if (!html) return "";
   return html
@@ -83,7 +116,7 @@ export async function fetchRSSSource(source: RSSSource): Promise<RawArticle[]> {
       const description = extractDescription(item);
       const imageUrl =
         item.thumbnail ||
-        (item as Record<string, unknown>)["media:thumbnail"] ||
+        extractMediaThumbnail(item) ||
         extractImageFromContent(item.content || item["content:encoded"]);
 
       return {

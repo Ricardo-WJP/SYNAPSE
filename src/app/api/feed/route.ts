@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getEnabledSources } from "@/lib/sources";
 import { fetchAllSources, generateSlug, stripHtml } from "@/lib/rss";
 import { processArticle } from "@/lib/ai";
-import { upsertArticle, checkArticleExists } from "@/lib/supabase";
+import { upsertArticle, checkArticleExistsByUrl } from "@/lib/supabase";
 import { validateArticle } from "@/lib/content-validation";
 
 interface ArticleData {
@@ -48,8 +48,8 @@ export async function POST(request: NextRequest) {
   for (const article of rawArticles) {
     const slug = generateSlug(article.title);
 
-    // Stage 1: Duplicate check
-    const exists = await checkArticleExists(slug);
+    // Stage 1: Duplicate check by URL (slug includes timestamp so it's never the same)
+    const exists = article.link ? await checkArticleExistsByUrl(article.link) : false;
     if (exists) {
       processed.push({
         title: article.title,

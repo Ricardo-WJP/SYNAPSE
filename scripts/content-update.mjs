@@ -29,30 +29,30 @@ const CONFIG = {
 // ============== RSS Sources ==============
 const RSS_SOURCES = [
   // Design - Chinese
-  { id: "uisdc", name: "优设", url: "https://www.uisdc.com/feed", category: "design", language: "zh" },
-  { id: "zcool", name: "站酷", url: "https://www.zcool.com.cn/rss/channel/4", category: "design", language: "zh" },
-  { id: "uisdc-design", name: "优设设计网", url: "https://hao.uisdc.com/feed/", category: "design", language: "zh" },
+  // { id: "uisdc", name: "优设", url: "https://www.uisdc.com/feed", category: "design", language: "zh" }, // XML parse error
+  // { id: "zcool", name: "站酷", url: "https://www.zcool.com.cn/rss/channel/4", category: "design", language: "zh" }, // 404
+  // { id: "uisdc-design", name: "优设设计网", url: "https://hao.uisdc.com/feed/", category: "design", language: "zh" }, // XML parse error
   // Design - English
   { id: "awwwards", name: "Awwwards", url: "https://www.awwwards.com/blog/feed/", category: "design", language: "en" },
-  { id: "dribbble", name: "Dribbble", url: "https://dribbble.com/shots/popular/feed.rss", category: "design", language: "en" },
+  // { id: "dribbble", name: "Dribbble", url: "https://dribbble.com/shots/popular/feed.rss", category: "design", language: "en" }, // XML parse error
   { id: "smashingmagazine", name: "Smashing Magazine", url: "https://www.smashingmagazine.com/feed/", category: "design", language: "en" },
-  { id: "creative-boom", name: "Creative Boom", url: "https://creativeboom.com/feed/", category: "design", language: "en" },
-  { id: "designweek", name: "Design Week", url: "https://www.designweek.co.uk/feed/", category: "design", language: "en" },
+  // { id: "creative-boom", name: "Creative Boom", url: "https://creativeboom.com/feed/", category: "design", language: "en" }, // 404
+  // { id: "designweek", name: "Design Week", url: "https://www.designweek.co.uk/feed/", category: "design", language: "en" }, // 403
   // AI - Chinese
-  { id: "huxiu-ai", name: "虎嗅AI", url: "https://www.huxiu.com/channel/103.html/rss.xml", category: "ai", language: "zh" },
-  { id: "jiqizhixin", name: "机器之心", url: "https://jiqizhixin.com/rss", category: "ai", language: "zh" },
-  { id: "zhihuai", name: "知乎AI", url: "https://www.zhihu.com/rss", category: "ai", language: "zh" },
+  // { id: "huxiu-ai", name: "虎嗅AI", url: "https://www.huxiu.com/channel/103.html/rss.xml", category: "ai", language: "zh" }, // 404
+  // { id: "jiqizhixin", name: "机器之心", url: "https://jiqizhixin.com/rss", category: "ai", language: "zh" }, // cert expired
+  // { id: "zhihuai", name: "知乎AI", url: "https://www.zhihu.com/rss", category: "ai", language: "zh" }, // XML parse error
   // AI - English
   { id: "mit-tech-review", name: "MIT Tech Review", url: "https://www.technologyreview.com/feed/", category: "ai", language: "en" },
   { id: "venturebeat-ai", name: "VentureBeat AI", url: "https://venturebeat.com/category/ai/feed/", category: "ai", language: "en" },
   { id: "openai-blog", name: "OpenAI Blog", url: "https://openai.com/blog/rss.xml", category: "ai", language: "en" },
-  { id: "deepmind-blog", name: "Google DeepMind", url: "https://deepmind.com/blog/feed/broad/", category: "ai", language: "en" },
-  { id: "anthropic-news", name: "Anthropic News", url: "https://www.anthropic.com/news/rss", category: "ai", language: "en" },
+  // { id: "deepmind-blog", name: "Google DeepMind", url: "https://deepmind.com/blog/feed/broad/", category: "ai", language: "en" }, // 404
+  // { id: "anthropic-news", name: "Anthropic News", url: "https://www.anthropic.com/news/rss", category: "ai", language: "en" }, // 404
   { id: "ai-news", name: "AI News", url: "https://www.artificialintelligence-news.com/feed/", category: "ai", language: "en" },
-  { id: "verge-ai", name: "The Verge AI", url: "https://www.theverge.com/ai-artificial-intelligence/rss/index.xml", category: "ai", language: "en" },
+  // { id: "verge-ai", name: "The Verge AI", url: "https://www.theverge.com/ai-artificial-intelligence/rss/index.xml", category: "ai", language: "en" }, // 404
   { id: "techcrunch-ai", name: "TechCrunch AI", url: "https://techcrunch.com/category/artificial-intelligence/feed/", category: "ai", language: "en" },
   { id: "marktechpost", name: "MarkTechPost", url: "https://www.marktechpost.com/feed/", category: "ai", language: "en" },
-  { id: "analytics-india", name: "Analytics India Mag", url: "https://analyticsindiamag.com/feed/", category: "ai", language: "en" },
+  // { id: "analytics-india", name: "Analytics India Mag", url: "https://analyticsindiamag.com/feed/", category: "ai", language: "en" }, // XML parse error
 ];
 
 // ============== Utilities ==============
@@ -120,7 +120,44 @@ function extractMediaThumbnail(item) {
   return undefined;
 }
 
+function extractEnclosureImage(item) {
+  const enclosure = item["enclosure"];
+  if (!enclosure) return undefined;
+  if (typeof enclosure === "object" && typeof enclosure.url === "string") {
+    return enclosure.url;
+  }
+  return undefined;
+}
+
+function extractMediaContent(item) {
+  const media = item["media:content"];
+  if (!media) return undefined;
+
+  if (Array.isArray(media)) {
+    for (const m of media) {
+      if (typeof m === "object") {
+        if (m.medium === "image" || (m.type && m.type.startsWith("image/"))) {
+          return m.url;
+        }
+      }
+    }
+    if (media.length > 0 && typeof media[0] === "object") {
+      return media[0].url;
+    }
+  }
+
+  if (typeof media === "object") {
+    if (media.medium === "image" || (media.type && media.type.startsWith("image/"))) {
+      return media.url;
+    }
+    return media.url;
+  }
+
+  return undefined;
+}
+
 // ============== Validation ==============
+
 function validateArticle(article) {
   if (!article.title || article.title.trim().length < 5) {
     return { valid: false, reason: "标题过短或为空" };
@@ -261,7 +298,7 @@ async function fetchRSSSource(source) {
     const feed = await parser.parseURL(source.url);
     return feed.items.slice(0, 20).map((item) => {
       const description = stripHtml(item.contentSnippet || item.content || item.summary || "").substring(0, 500);
-      const imageUrl = item.thumbnail || extractMediaThumbnail(item) || extractImageFromContent(item.content || item["content:encoded"]);
+      const imageUrl = item.thumbnail || extractMediaThumbnail(item) || extractEnclosureImage(item) || extractMediaContent(item) || extractImageFromContent(item.content || item["content:encoded"]);
 
       return {
         title: item.title || "Untitled",
@@ -305,8 +342,9 @@ function createSupabaseClient() {
   return createClient(CONFIG.supabaseUrl, CONFIG.supabaseAnonKey);
 }
 
-async function checkArticleExists(supabase, slug) {
-  const { data, error } = await supabase.from("articles").select("slug").eq("slug", slug).single();
+async function checkArticleExistsByUrl(supabase, sourceUrl) {
+  if (!sourceUrl) return false;
+  const { data, error } = await supabase.from("articles").select("id").eq("source_url", sourceUrl).single();
   return !error && data !== null;
 }
 
@@ -350,8 +388,8 @@ async function processArticles(category, skipAI) {
     const slug = generateSlug(article.title);
     console.log(`\nProcessing: ${article.title.substring(0, 50)}...`);
 
-    // Check duplicate
-    const exists = await checkArticleExists(supabase, slug);
+    // Check duplicate by source URL (slug changes every run due to timestamp)
+    const exists = await checkArticleExistsByUrl(supabase, article.link);
     if (exists) {
       console.log("  -> Skipped (duplicate)");
       processed.push({ title: article.title, status: "skipped", stage: "duplicate" });

@@ -85,6 +85,49 @@ function extractMediaThumbnail(
   return undefined;
 }
 
+function extractEnclosureImage(item: Parser.Item): string | undefined {
+  const enclosure = (item as Record<string, unknown>).enclosure;
+  if (!enclosure) return undefined;
+
+  if (typeof enclosure === "object") {
+    const url = (enclosure as Record<string, string>).url;
+    if (typeof url === "string") return url;
+  }
+
+  return undefined;
+}
+
+function extractMediaContent(item: Parser.Item): string | undefined {
+  const media = (item as Record<string, unknown>)["media:content"];
+  if (!media) return undefined;
+
+  if (Array.isArray(media)) {
+    for (const m of media) {
+      if (typeof m === "object") {
+        const medium = (m as Record<string, string>).medium;
+        const type = (m as Record<string, string>).type;
+        if (medium === "image" || (type && type.startsWith("image/"))) {
+          return (m as Record<string, string>).url;
+        }
+      }
+    }
+    if (media.length > 0 && typeof media[0] === "object") {
+      return (media[0] as Record<string, string>).url;
+    }
+  }
+
+  if (typeof media === "object") {
+    const medium = (media as Record<string, string>).medium;
+    const type = (media as Record<string, string>).type;
+    if (medium === "image" || (type && type.startsWith("image/"))) {
+      return (media as Record<string, string>).url;
+    }
+    return (media as Record<string, string>).url;
+  }
+
+  return undefined;
+}
+
 function stripHtml(html?: string): string {
   if (!html) return "";
   return html
@@ -117,6 +160,8 @@ export async function fetchRSSSource(source: RSSSource): Promise<RawArticle[]> {
       const imageUrl =
         item.thumbnail ||
         extractMediaThumbnail(item) ||
+        extractEnclosureImage(item) ||
+        extractMediaContent(item) ||
         extractImageFromContent(item.content || item["content:encoded"]);
 
       return {

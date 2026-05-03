@@ -9,7 +9,7 @@ export const rssSources: RSSSource[] = [
     url: "https://www.uisdc.com/feed",
     category: "design",
     language: "zh",
-    enabled: true,
+    enabled: false,
     priority: 1,
   },
   {
@@ -19,7 +19,7 @@ export const rssSources: RSSSource[] = [
     url: "https://www.zcool.com.cn/rss/channel/4",
     category: "design",
     language: "zh",
-    enabled: true,
+    enabled: false,
     priority: 2,
   },
   {
@@ -29,7 +29,7 @@ export const rssSources: RSSSource[] = [
     url: "https://hao.uisdc.com/feed/",
     category: "design",
     language: "zh",
-    enabled: true,
+    enabled: false,
     priority: 3,
   },
 
@@ -51,7 +51,7 @@ export const rssSources: RSSSource[] = [
     url: "https://dribbble.com/shots/popular/feed.rss",
     category: "design",
     language: "en",
-    enabled: true,
+    enabled: false,
     priority: 5,
   },
   {
@@ -71,7 +71,7 @@ export const rssSources: RSSSource[] = [
     url: "https://creativeboom.com/feed/",
     category: "design",
     language: "en",
-    enabled: true,
+    enabled: false,
     priority: 7,
   },
   {
@@ -81,7 +81,7 @@ export const rssSources: RSSSource[] = [
     url: "https://www.designweek.co.uk/feed/",
     category: "design",
     language: "en",
-    enabled: true,
+    enabled: false,
     priority: 8,
   },
 
@@ -93,7 +93,7 @@ export const rssSources: RSSSource[] = [
     url: "https://www.huxiu.com/channel/103.html/rss.xml",
     category: "ai",
     language: "zh",
-    enabled: true,
+    enabled: false,
     priority: 9,
   },
   {
@@ -103,7 +103,7 @@ export const rssSources: RSSSource[] = [
     url: "https://jiqizhixin.com/rss",
     category: "ai",
     language: "zh",
-    enabled: true,
+    enabled: false,
     priority: 10,
   },
   {
@@ -113,7 +113,7 @@ export const rssSources: RSSSource[] = [
     url: "https://www.zhihu.com/rss",
     category: "ai",
     language: "zh",
-    enabled: true,
+    enabled: false,
     priority: 11,
   },
 
@@ -155,7 +155,7 @@ export const rssSources: RSSSource[] = [
     url: "https://deepmind.com/blog/feed/broad/",
     category: "ai",
     language: "en",
-    enabled: true,
+    enabled: false,
     priority: 15,
   },
   {
@@ -165,7 +165,7 @@ export const rssSources: RSSSource[] = [
     url: "https://www.anthropic.com/news/rss",
     category: "ai",
     language: "en",
-    enabled: true,
+    enabled: false,
     priority: 16,
   },
   {
@@ -185,7 +185,7 @@ export const rssSources: RSSSource[] = [
     url: "https://www.theverge.com/ai-artificial-intelligence/rss/index.xml",
     category: "ai",
     language: "en",
-    enabled: true,
+    enabled: false,
     priority: 18,
   },
   {
@@ -215,7 +215,7 @@ export const rssSources: RSSSource[] = [
     url: "https://analyticsindiamag.com/feed/",
     category: "ai",
     language: "en",
-    enabled: true,
+    enabled: false,
     priority: 21,
   },
 

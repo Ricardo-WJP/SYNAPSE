@@ -98,6 +98,20 @@ export async function checkArticleExists(slug: string): Promise<boolean> {
   return !error && data !== null;
 }
 
+export async function checkArticleExistsByUrl(sourceUrl: string): Promise<boolean> {
+  if (!supabase) {
+    return false;
+  }
+
+  const { data, error } = await supabase
+    .from("articles")
+    .select("id")
+    .eq("source_url", sourceUrl)
+    .single();
+
+  return !error && data !== null;
+}
+
 export async function upsertArticle(article: {
   title: string;
   title_en?: string;

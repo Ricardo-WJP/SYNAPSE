@@ -24,6 +24,7 @@ const CONFIG = {
   miniMaxBaseUrl: "https://api.minimax.chat/v1",
   maxArticles: 15,
   aiTimeoutMs: 30000, // 30 seconds per article
+  imageTimeoutMs: 60000, // 60 seconds for image generation
 };
 
 // ============== RSS Sources ==============
@@ -290,6 +291,78 @@ async function processArticleWithAI(article) {
   }
 }
 
+async function generateArticleImage(client, title, summary, category) {
+  const stylePrompt = category === "design"
+    ? "Modern minimalist design, elegant composition, soft lighting, professional design aesthetics, abstract shapes"
+    : "Futuristic technology scene, digital data visualization, neural networks, glowing circuits, blue and purple tones";
+
+  const prompt = `Create a high-quality featured image for a news article about: ${title}.
+Additional context: ${summary || title}
+Style: ${stylePrompt}
+The image should be visually striking, suitable for a modern news website. No text, no watermarks, no logos.`;
+
+  const response = await fetch("https://api.minimax.chat/v1/image_generation", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${CONFIG.miniMaxApiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: "image-01",
+      prompt,
+      n: 1,
+      size: "1280x720",
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`HTTP ${response.status}: ${errorText}`);
+  }
+
+  const data = await response.json();
+  const imageUrl = data.data?.[0]?.url || data.data?.[0]?.image_url;
+  if (!imageUrl) {
+    throw new Error("No image URL in response");
+  }
+  return imageUrl;
+}
+
+async function scoreArticleImportance(client, title, description, source) {
+  const prompt = `You are a professional news editor. Rate the importance of this article on a scale of 1-10 (decimals allowed, e.g. 7.5).
+Consider: industry impact, audience interest, novelty, timeliness, source credibility.
+
+Article Title: ${title}
+Source: ${source}
+Description: ${description || "N/A"}
+
+Respond ONLY with a number from 1 to 10. No explanation.`;
+
+  const response = await client.chat.completions.create({
+    model: "MiniMax-M2.5",
+    messages: [{ role: "user", content: prompt }],
+    temperature: 0.2,
+    max_tokens: 10,
+  });
+
+  const content = response.choices[0]?.message?.content?.trim() || "5";
+  const match = content.match(/(\d+(?:\.\d+)?)/);
+  const score = match ? parseFloat(match[1]) : 5;
+  return isNaN(score) ? 5 : Math.min(10, Math.max(1, score));
+}
+
+// ============== Date Utilities ==============
+function getArticleDate(article) {
+  const date = new Date(article.pubDate || article.isoDate || Date.now());
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+function isSameDay(d1, d2) {
+  return d1.getFullYear() === d2.getFullYear() &&
+    d1.getMonth() === d2.getMonth() &&
+    d1.getDate() === d2.getDate();
+}
+
 // ============== RSS Fetching ==============
 const parser = new Parser({ timeout: 10000, headers: { "User-Agent": "DesignAI-Knowledge/1.0" } });
 
@@ -369,10 +442,11 @@ async function processArticles(category, skipAI) {
   }
 
   const supabase = createSupabaseClient();
+  const client = skipAI ? null : await createAIClient();
 
   // Fetch articles
-  console.log("\n[1/4] Fetching RSS feeds...");
-  const articles = (await fetchAllSources(category)).slice(0, CONFIG.maxArticles);
+  console.log("\n[1/5] Fetching RSS feeds...");
+  const articles = await fetchAllSources(category);
   console.log(`Found ${articles.length} articles`);
 
   if (articles.length === 0) {
@@ -380,15 +454,75 @@ async function processArticles(category, skipAI) {
     return { processed: [], summary: { total: 0, success: 0, skipped: 0, errors: 0 } };
   }
 
-  // Process each article
-  console.log("\n[2/4] Processing articles...");
-  const processed = [];
+  // Score importance for all articles in parallel
+  console.log("\n[2/5] Scoring article importance...");
+  if (client) {
+    const scoringPromises = articles.map(async (article) => {
+      try {
+        const score = await withTimeout(
+          scoreArticleImportance(client, article.title, article.description, article.source),
+          CONFIG.aiTimeoutMs,
+          "Importance scoring"
+        );
+        article.importanceScore = score;
+      } catch (e) {
+        article.importanceScore = 5;
+      }
+    });
+    await Promise.allSettled(scoringPromises);
+  } else {
+    articles.forEach(a => a.importanceScore = 5);
+  }
+
+  // Group by date: today first, yesterday second
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+
+  const todayArticles = [];
+  const yesterdayArticles = [];
+  const olderArticles = [];
 
   for (const article of articles) {
+    const articleDate = getArticleDate(article);
+    if (isSameDay(articleDate, today)) {
+      todayArticles.push(article);
+    } else if (isSameDay(articleDate, yesterday)) {
+      yesterdayArticles.push(article);
+    } else {
+      olderArticles.push(article);
+    }
+  }
+
+  // Sort each group by importance descending
+  const sortByImportance = (a, b) => (b.importanceScore || 0) - (a.importanceScore || 0);
+  todayArticles.sort(sortByImportance);
+  yesterdayArticles.sort(sortByImportance);
+  olderArticles.sort(sortByImportance);
+
+  // Select: today first, then yesterday, then older if needed
+  let selected = [...todayArticles];
+  if (selected.length < CONFIG.maxArticles) {
+    selected.push(...yesterdayArticles.slice(0, CONFIG.maxArticles - selected.length));
+  }
+  if (selected.length < CONFIG.maxArticles) {
+    selected.push(...olderArticles.slice(0, CONFIG.maxArticles - selected.length));
+  }
+
+  console.log(`\nSelected ${selected.length} articles:`);
+  console.log(`  Today: ${todayArticles.length}, Yesterday: ${yesterdayArticles.length}, Older: ${olderArticles.length}`);
+
+  // Process each selected article
+  console.log("\n[3/5] Processing articles...");
+  const processed = [];
+
+  for (const article of selected) {
     const slug = generateSlug(article.title);
     console.log(`\nProcessing: ${article.title.substring(0, 50)}...`);
+    console.log(`  Date: ${getArticleDate(article).toISOString().split("T")[0]}, Score: ${article.importanceScore}`);
 
-    // Check duplicate by source URL (slug changes every run due to timestamp)
+    // Check duplicate by source URL
     const exists = await checkArticleExistsByUrl(supabase, article.link);
     if (exists) {
       console.log("  -> Skipped (duplicate)");
@@ -413,10 +547,11 @@ async function processArticles(category, skipAI) {
       tags: [article.category],
       language: article.language,
       slug,
+      importance_score: article.importanceScore || 5,
     };
 
     // AI processing
-    if (!skipAI) {
+    if (!skipAI && client) {
       try {
         console.log("  -> AI processing...");
         const aiResult = await processArticleWithAI(article);
@@ -432,8 +567,25 @@ async function processArticles(category, skipAI) {
           language: "bilingual",
         };
       } catch (aiError) {
-        console.log(`  -> AI failed: ${aiError.message}`);
-        // Continue with original data if AI processing fails
+        console.log(`  -> AI processing failed: ${aiError.message}`);
+      }
+    }
+
+    // Generate image if missing
+    if (!articleData.image_url && !skipAI && client) {
+      try {
+        console.log("  -> Generating image...");
+        const imageUrl = await withTimeout(
+          generateArticleImage(client, articleData.title, articleData.description, articleData.category),
+          CONFIG.imageTimeoutMs,
+          "Image generation"
+        );
+        if (imageUrl) {
+          articleData.image_url = imageUrl;
+          console.log("  -> Image generated successfully");
+        }
+      } catch (imgError) {
+        console.log(`  -> Image generation failed: ${imgError.message}`);
       }
     }
 
@@ -475,7 +627,7 @@ async function processArticles(category, skipAI) {
     errors: processed.filter(p => p.status === "error").length,
   };
 
-  console.log("\n[3/4] Processing complete!");
+  console.log("\n[4/5] Processing complete!");
   console.log(`Success: ${summary.success}, Skipped: ${summary.skipped}, Rejected: ${summary.rejected}, Errors: ${summary.errors}`);
 
   return { processed, summary };

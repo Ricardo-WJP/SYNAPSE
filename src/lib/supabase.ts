@@ -34,6 +34,7 @@ export interface Database {
     language: "zh" | "en" | "bilingual";
     slug: string;
     is_processed: boolean;
+    importance_score?: number;
     created_at: string;
     updated_at: string;
   };
@@ -85,6 +86,18 @@ export async function getArticles(options?: {
     if (seen.has(article.source_url)) return false;
     seen.add(article.source_url);
     return true;
+  });
+
+  // Secondary sort by importance_score within the same day
+  deduped.sort((a, b) => {
+    const dateA = new Date(a.published_at).toDateString();
+    const dateB = new Date(b.published_at).toDateString();
+    if (dateA !== dateB) {
+      // Different days: keep published_at order (already sorted by DB)
+      return new Date(b.published_at).getTime() - new Date(a.published_at).getTime();
+    }
+    // Same day: sort by importance_score descending
+    return (b.importance_score || 0) - (a.importance_score || 0);
   });
 
   return { data: deduped, error: null };
@@ -142,6 +155,7 @@ export async function upsertArticle(article: {
   tags: string[];
   language: "zh" | "en" | "bilingual";
   slug: string;
+  importance_score?: number;
 }) {
   if (!supabase) {
     return { data: null, error: "Supabase not configured" };

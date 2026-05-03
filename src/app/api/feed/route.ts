@@ -33,11 +33,10 @@ export async function POST(request: NextRequest) {
 
   const searchParams = request.nextUrl.searchParams;
   const category = searchParams.get("category") as "design" | "ai" | null;
-  const skipAi = searchParams.get("skipAI") === "true";
 
   const sources = getEnabledSources(category || undefined);
 
-  const rawArticles = (await fetchAllSources(sources)).slice(0, 15);
+  const rawArticles = (await fetchAllSources(sources)).slice(0, 10);
 
   const processed: {
     title: string;
@@ -81,49 +80,45 @@ export async function POST(request: NextRequest) {
     };
 
     // Stage 3: AI processing with timeout
-    if (!skipAi) {
-      try {
-        const timeoutMs = 8000;
-        const timeoutPromise = new Promise<never>((_, reject) =>
-          setTimeout(() => reject(new Error("AI processing timeout")), timeoutMs)
-        );
+    try {
+      const timeoutMs = 15000;
+      const timeoutPromise = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("AI processing timeout")), timeoutMs)
+      );
 
-        const aiResult = await Promise.race([
-          processArticle({
-            title: article.title,
-            description: article.description,
-            content: article.content,
-            category: article.category,
-            language: article.language,
-          }),
-          timeoutPromise,
-        ]);
-
-        processedData = {
-          ...processedData,
-          title: aiResult.title,
-          title_en: aiResult.titleEn,
-          description: aiResult.summary || stripHtml(article.description),
-          description_en: aiResult.summaryEn,
-          summary: aiResult.summary,
-          summary_en: aiResult.summaryEn,
-          tags: [
-            ...new Set([
-              article.category,
-              ...aiResult.tags.map((t) => t.toLowerCase()),
-            ]),
-          ],
-          language: "bilingual",
-        };
-      } catch (aiError) {
-        processed.push({
+      const aiResult = await Promise.race([
+        processArticle({
           title: article.title,
-          status: "skipped",
-          stage: "ai-processing",
-          error: aiError instanceof Error ? aiError.message : "AI processing failed",
-        });
-        continue;
-      }
+          description: article.description,
+          content: article.content,
+          category: article.category,
+          language: article.language,
+        }),
+        timeoutPromise,
+      ]);
+
+      processedData = {
+        ...processedData,
+        title: aiResult.title,
+        title_en: aiResult.titleEn,
+        description: aiResult.summary || stripHtml(article.description),
+        description_en: aiResult.summaryEn,
+        summary: aiResult.summary,
+        summary_en: aiResult.summaryEn,
+        tags: [
+          ...new Set([
+            article.category,
+            ...aiResult.tags.map((t) => t.toLowerCase()),
+          ]),
+        ],
+        language: "bilingual",
+      };
+    } catch (aiError) {
+      console.warn(
+        `AI processing failed for "${article.title}":`,
+        aiError instanceof Error ? aiError.message : "Unknown error"
+      );
+      // Continue with original data if AI processing fails
     }
 
     // Stage 4: Content validation
